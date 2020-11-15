@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:tasteatlasadmin/ModelsAndProviders/MainScreenPRovider.dart';
+import 'package:tasteatlasadmin/ModelsAndProviders/connectivity_status.dart';
 import 'package:tasteatlasadmin/TopContainer.dart';
 
 void main() async {
@@ -14,12 +15,16 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<MainScreenProvider>(
-            create: (context) => MainScreenProvider())
+            create: (context) => MainScreenProvider()),
+        StreamProvider<ConnectionCheck>.value(
+          value: CheckConnectionStatus().connectionChecker.stream,
+        )
       ],
       child: MaterialApp(home: MyHomePage()),
     );
@@ -38,325 +43,387 @@ class _MyHomePageState extends State<MyHomePage> {
   List ready = [];
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     MainScreenProvider _mainScreenProvider =
         Provider.of<MainScreenProvider>(context);
-
+    ConnectionCheck _connectivity = Provider.of<ConnectionCheck>(context);
+    print(_connectivity);
     final size = MediaQuery.of(context).size;
-    print(_mainScreenProvider.a);
-    return Scaffold(
-      backgroundColor: Color(0xFFF3F4F8),
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverPersistentHeader(
-              delegate: TopContainer(minExtent: 200, maxExtent: 250),
-            ),
-            SliverToBoxAdapter(
-              child: Consumer<MainScreenProvider>(
-                builder: (BuildContext context, MainScreenProvider _provider,
-                        Widget child) =>
-                    Visibility(
-                  visible: _provider.a,
-                  child: child,
+    switch (_connectivity) {
+      case ConnectionCheck.Working:
+        return Scaffold(
+          backgroundColor: Color(0xFFF3F4F8),
+          body: SafeArea(
+            child: CustomScrollView(
+              slivers: [
+                SliverPersistentHeader(
+                  delegate: TopContainer(minExtent: 200, maxExtent: 250),
                 ),
-                child: StreamBuilder(
-                  stream: _firestore.collection('currentOrder').snapshots(),
-                  builder:
-                      (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                    if (snapshot.data == null) {
-                      return Text('Loading ....');
-                    }
-                    Orders.clear();
-                    snapshot.data.docs.forEach((element) {
-                      Orders.add(element);
-                    });
-                    return ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      itemCount: Orders.length,
-                      shrinkWrap: true,
-                      itemBuilder: (BuildContext context, int index) {
-                        Map abc = Orders[index].data().values.first;
-                        String uid = Orders[index].data().keys.first;
-                        Timestamp dateTime = abc.values.first['orderedTime'];
-                        bool inProgress = abc.values.first['inProgress'];
-                        print(inProgress);
-                        totalAmount = 0;
-                        double tax = 5 / 100;
-                        int CartTotal = 0;
-                        abc.forEach((key, value) {
-                          CartTotal += value['price'] * value['quantity'];
-                        });
-                        tax =
-                            double.parse((CartTotal * tax).toStringAsFixed(2));
-                        totalAmount = CartTotal + tax;
-                        return Visibility(
-                          visible: inProgress,
-                          child: Container(
-                            padding: EdgeInsets.only(right: 20, left: 20),
-                            height: size.height * 0.4,
-                            margin: EdgeInsets.only(
-                                top: 10, bottom: 10, left: 20, right: 20),
-                            decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(8)),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'OrderID : ${Orders[index].id.toString()} | ${dateTime.toDate().hour}:${dateTime.toDate().minute} ',
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                  ),
-                                ),
-                                Container(
-                                  decoration: BoxDecoration(
-                                      border: Border.symmetric(
-                                          horizontal: BorderSide(
-                                    color: Colors.grey,
-                                    width: 2,
-                                  ))),
-                                  child: ListView.builder(
-                                    physics: NeverScrollableScrollPhysics(),
-                                    padding:
-                                        EdgeInsets.only(top: 20, bottom: 20),
-                                    itemCount: abc.length,
-                                    shrinkWrap: true,
-                                    itemBuilder:
-                                        (BuildContext context, int index2) {
-                                      print(index2);
-                                      String key = abc.keys.elementAt(
-                                          index2); // key = product id
-                                      return Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                SliverToBoxAdapter(
+                  child: Consumer<MainScreenProvider>(
+                    builder: (BuildContext context,
+                            MainScreenProvider _provider, Widget child) =>
+                        Visibility(
+                      visible: _provider.a,
+                      child: child,
+                    ),
+                    child: StreamBuilder(
+                      stream: _firestore.collection('currentOrder').snapshots(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<dynamic> snapshot) {
+                        Orders.clear();
+                        try {
+                          snapshot.data.docs.forEach((element) {
+                            Orders.add(element);
+                          });
+                        } catch (e) {
+                          return Text('Loading ....');
+                        }
+
+                        return ListView.builder(
+                          physics: NeverScrollableScrollPhysics(),
+                          scrollDirection: Axis.vertical,
+                          itemCount: Orders.length,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            Map abc = Orders[index].data().values.first;
+                            String uid = Orders[index].data().keys.first;
+                            Timestamp dateTime =
+                                abc.values.first['orderedTime'];
+                            bool inProgress = abc.values.first['inProgress'];
+                            print(inProgress);
+                            totalAmount = 0;
+                            double tax = 5 / 100;
+                            int CartTotal = 0;
+                            abc.forEach((key, value) {
+                              CartTotal += value['price'] * value['quantity'];
+                            });
+                            tax = double.parse(
+                                (CartTotal * tax).toStringAsFixed(2));
+                            totalAmount = CartTotal + tax;
+                            return Visibility(
+                              visible: inProgress,
+                              child: Container(
+                                padding: EdgeInsets.only(right: 20, left: 20),
+                                height: size.height * 0.4,
+                                margin: EdgeInsets.only(
+                                    top: 10, bottom: 10, left: 20, right: 20),
+                                decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8)),
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'OrderID : ${Orders[index].id.toString()} | ${dateTime.toDate().hour}:${dateTime.toDate().minute} ',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          border: Border.symmetric(
+                                              horizontal: BorderSide(
+                                        color: Colors.grey,
+                                        width: 2,
+                                      ))),
+                                      child: ListView.builder(
+                                        physics: NeverScrollableScrollPhysics(),
+                                        padding: EdgeInsets.only(
+                                            top: 20, bottom: 20),
+                                        itemCount: abc.length,
+                                        shrinkWrap: true,
+                                        itemBuilder:
+                                            (BuildContext context, int index2) {
+                                          print(index2);
+                                          String key = abc.keys.elementAt(
+                                              index2); // key = product id
+                                          return Column(
                                             children: [
-                                              Text(
-                                                '${abc[key]['quantity']} X ${abc[key]['name']}',
-                                                style: TextStyle(
-                                                    fontWeight:
-                                                        FontWeight.bold),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Text(
+                                                    '${abc[key]['quantity']} X ${abc[key]['name']}',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                  Text(
+                                                      'Rs ${abc[key]['price']}')
+                                                ],
                                               ),
-                                              Text('Rs ${abc[key]['price']}')
+                                              SizedBox(
+                                                height: 10,
+                                              )
                                             ],
-                                          ),
-                                          SizedBox(
-                                            height: 10,
-                                          )
-                                        ],
-                                      );
-                                    },
-                                  ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    Text('Total bill : Rs ${totalAmount}'),
+                                    InkWell(
+                                      onTap: () {
+                                        _mainScreenProvider.prepared(
+                                            Orders[index].id.toString(),
+                                            uid,
+                                            abc);
+                                      },
+                                      child: Container(
+                                        height: 60,
+                                        width: size.width - 50,
+                                        decoration: BoxDecoration(
+                                            color: Colors.deepOrange,
+                                            borderRadius:
+                                                BorderRadius.circular(10)),
+                                        child: Center(
+                                            child: inProgress
+                                                ? Text(
+                                                    'Prepared',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontWeight:
+                                                            FontWeight.w700,
+                                                        fontSize: 18),
+                                                  )
+                                                : Text('Delivery Pending')),
+                                      ),
+                                    )
+                                  ],
                                 ),
-                                Text('Total bill : Rs ${totalAmount}'),
-                                InkWell(
-                                  onTap: () {
-                                    _mainScreenProvider.prepared(
-                                        Orders[index].id.toString(), uid, abc);
-                                  },
-                                  child: Container(
-                                    height: 60,
-                                    width: size.width - 50,
-                                    decoration: BoxDecoration(
-                                        color: Colors.deepOrange,
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: Center(
-                                        child: inProgress
-                                            ? Text(
-                                                'Prepared',
+                              ),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Consumer<MainScreenProvider>(
+                    builder: (BuildContext context,
+                            MainScreenProvider _provider, Widget child) =>
+                        Visibility(
+                      visible: _provider.b,
+                      child: child,
+                    ),
+                    child: Stack(
+                      children: [
+                        Consumer<MainScreenProvider>(
+                          builder: (BuildContext context,
+                                  MainScreenProvider mainScreenValue,
+                                  Widget child) =>
+                              Visibility(
+                            visible: mainScreenValue.sucessDelivered,
+                            child: child,
+                          ),
+                          child: StreamBuilder(
+                            stream: _firestore
+                                .collection('currentOrder')
+                                .snapshots(),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<dynamic> snapshot) {
+                              if (snapshot.data == null) {
+                                return Text('Loading ....');
+                              }
+                              try {
+                                Orders.clear();
+                                snapshot.data.docs.forEach((element) {
+                                  Orders.add(element);
+                                });
+                              } catch (e) {
+                                return Text('Loading ....');
+                              }
+
+                              return ListView.builder(
+                                physics: NeverScrollableScrollPhysics(),
+                                scrollDirection: Axis.vertical,
+                                itemCount: Orders.length,
+                                shrinkWrap: true,
+                                itemBuilder: (BuildContext context, int index) {
+                                  if (snapshot.data == null) {
+                                    return Text('Yor data is Loading ....');
+                                  }
+                                  Map abc = Orders[index].data().values.first;
+                                  String uid = Orders[index].data().keys.first;
+                                  print(uid);
+                                  Timestamp dateTime =
+                                      abc.values.first['orderedTime'];
+                                  bool delivered =
+                                      !abc.values.first['inProgress'];
+
+                                  print(delivered);
+                                  totalAmount = 0;
+                                  double tax = 5 / 100;
+                                  int CartTotal = 0;
+                                  abc.forEach((key, value) {
+                                    CartTotal +=
+                                        value['price'] * value['quantity'];
+                                  });
+                                  tax = double.parse(
+                                      (CartTotal * tax).toStringAsFixed(2));
+                                  totalAmount = CartTotal + tax;
+                                  return Visibility(
+                                    visible: delivered,
+                                    child: Container(
+                                      padding:
+                                          EdgeInsets.only(right: 20, left: 20),
+                                      height: size.height * 0.4,
+                                      margin: EdgeInsets.only(
+                                          top: 10,
+                                          bottom: 10,
+                                          left: 20,
+                                          right: 20),
+                                      decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'OrderID : ${Orders[index].id.toString()} | ${dateTime.toDate().hour}:${dateTime.toDate().minute} ',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                                border: Border.symmetric(
+                                                    horizontal: BorderSide(
+                                              color: Colors.grey,
+                                              width: 2,
+                                            ))),
+                                            child: ListView.builder(
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              padding: EdgeInsets.only(
+                                                  top: 20, bottom: 20),
+                                              itemCount: abc.length,
+                                              shrinkWrap: true,
+                                              itemBuilder:
+                                                  (BuildContext context,
+                                                      int index2) {
+                                                print(index2);
+                                                String key = abc.keys.elementAt(
+                                                    index2); // key = product id
+                                                return Column(
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Container(
+                                                          width: size.width / 2,
+                                                          child: Text(
+                                                            '${abc[key]['quantity']} X ${abc[key]['name']}',
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                            'Rs ${abc[key]['price']}')
+                                                      ],
+                                                    ),
+                                                    SizedBox(
+                                                      height: 10,
+                                                    )
+                                                  ],
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                          Text(
+                                              'Total bill : Rs ${totalAmount}'),
+                                          InkWell(
+                                            onTap: () {
+                                              _mainScreenProvider.delivered(
+                                                  Orders[index].id.toString(),
+                                                  uid,
+                                                  abc);
+                                            },
+                                            child: Container(
+                                              height: 60,
+                                              width: size.width - 50,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.deepOrange,
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          10)),
+                                              child: Center(
+                                                  child: Text(
+                                                'Delivered',
                                                 style: TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.w700,
                                                     fontSize: 18),
-                                              )
-                                            : Text('Delivery Pending')),
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(
-              child: Consumer<MainScreenProvider>(
-                builder: (BuildContext context, MainScreenProvider _provider,
-                        Widget child) =>
-                    Visibility(
-                  visible: _provider.b,
-                  child: child,
-                ),
-                child: Stack(
-                  children: [
-                    Consumer<MainScreenProvider>(
-                      builder: (BuildContext context,
-                              MainScreenProvider mainScreenValue,
-                              Widget child) =>
-                          Visibility(
-                        visible: mainScreenValue.sucessDelivered,
-                        child: child,
-                      ),
-                      child: StreamBuilder(
-                        stream:
-                            _firestore.collection('currentOrder').snapshots(),
-                        builder: (BuildContext context,
-                            AsyncSnapshot<dynamic> snapshot) {
-                          if (snapshot.data == null) {
-                            return Text('Loading ....');
-                          }
-                          Orders.clear();
-                          snapshot.data.docs.forEach((element) {
-                            Orders.add(element);
-                          });
-
-                          return ListView.builder(
-                            physics: NeverScrollableScrollPhysics(),
-                            scrollDirection: Axis.vertical,
-                            itemCount: Orders.length,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              Map abc = Orders[index].data().values.first;
-                              String uid = Orders[index].data().keys.first;
-                              Timestamp dateTime =
-                                  abc.values.first['orderedTime'];
-                              bool delivered = !abc.values.first['inProgress'];
-                              print(delivered);
-                              totalAmount = 0;
-                              double tax = 5 / 100;
-                              int CartTotal = 0;
-                              abc.forEach((key, value) {
-                                CartTotal += value['price'] * value['quantity'];
-                              });
-                              tax = double.parse(
-                                  (CartTotal * tax).toStringAsFixed(2));
-                              totalAmount = CartTotal + tax;
-                              return Visibility(
-                                visible: delivered,
-                                child: Container(
-                                  padding: EdgeInsets.only(right: 20, left: 20),
-                                  height: size.height * 0.4,
-                                  margin: EdgeInsets.only(
-                                      top: 10, bottom: 10, left: 20, right: 20),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(8)),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceEvenly,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'OrderID : ${Orders[index].id.toString()} | ${dateTime.toDate().hour}:${dateTime.toDate().minute} ',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                        ),
+                                              )),
+                                            ),
+                                          )
+                                        ],
                                       ),
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            border: Border.symmetric(
-                                                horizontal: BorderSide(
-                                          color: Colors.grey,
-                                          width: 2,
-                                        ))),
-                                        child: ListView.builder(
-                                          physics:
-                                              NeverScrollableScrollPhysics(),
-                                          padding: EdgeInsets.only(
-                                              top: 20, bottom: 20),
-                                          itemCount: abc.length,
-                                          shrinkWrap: true,
-                                          itemBuilder: (BuildContext context,
-                                              int index2) {
-                                            print(index2);
-                                            String key = abc.keys.elementAt(
-                                                index2); // key = product id
-                                            return Column(
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                      '${abc[key]['quantity']} X ${abc[key]['name']}',
-                                                      style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                    Text(
-                                                        'Rs ${abc[key]['price']}')
-                                                  ],
-                                                ),
-                                                SizedBox(
-                                                  height: 10,
-                                                )
-                                              ],
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                      Text('Total bill : Rs ${totalAmount}'),
-                                      InkWell(
-                                        onTap: () {
-                                          _mainScreenProvider.delivered(
-                                              Orders[index].id.toString(),
-                                              uid,
-                                              abc);
-                                        },
-                                        child: Container(
-                                          height: 60,
-                                          width: size.width - 50,
-                                          decoration: BoxDecoration(
-                                              color: Colors.deepOrange,
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                          child: Center(
-                                              child: Text(
-                                            'Delivered',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 18),
-                                          )),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
+                                    ),
+                                  );
+                                },
                               );
                             },
-                          );
-                        },
-                      ),
-                    ),
-                    Consumer<MainScreenProvider>(
-                      builder: (BuildContext context,
-                              MainScreenProvider providervalue, Widget child) =>
-                          Visibility(
-                        visible: !providervalue.sucessDelivered,
-                        child: Container(
-                          child:
-                              Lottie.asset('assets/animations/delivered.json'),
+                          ),
                         ),
-                      ),
-                    )
-                  ],
+                        Consumer<MainScreenProvider>(
+                          builder: (BuildContext context,
+                                  MainScreenProvider providervalue,
+                                  Widget child) =>
+                              Visibility(
+                            visible: !providervalue.sucessDelivered,
+                            child: Container(
+                              child: Lottie.asset(
+                                  'assets/animations/delivered.json'),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
+          ),
+        );
+      case ConnectionCheck.Offline:
+        return Scaffold(
+            body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Lottie.asset('assets/animations/connectionLsot.json'),
+            Text(
+              'Connection Lost...',
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
+            )
           ],
-        ),
-      ),
-    );
+        ));
+      default:
+        return Scaffold(
+          body: Center(child: Lottie.asset('assets/animations/wait.json')),
+        );
+    }
   }
 }

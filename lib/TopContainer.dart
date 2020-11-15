@@ -63,20 +63,42 @@ class TopContainer implements SliverPersistentHeaderDelegate {
                     stream: _firestore.collection('currentOrder').snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<dynamic> snapshot) {
-                      if (snapshot.data.docs == null) {
-                        return Text('0');
-                      }
                       List order = [];
-                      snapshot.data.docs.forEach((element) {
-                        if (element
-                            .data()
-                            .values
-                            .first
-                            .values
-                            .first['inProgress']) {
-                          order.add(element);
-                        }
-                      });
+
+                      try {
+                        snapshot.data.docs.forEach((element) {
+                          if (element
+                              .data()
+                              .values
+                              .first
+                              .values
+                              .first['inProgress']) {
+                            order.add(element);
+                          }
+                        });
+                      } catch (e) {
+                        return Container(
+                          margin: EdgeInsets.symmetric(horizontal: 10),
+                          width: size.width / 3,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              color: _mainscreenProvider.a
+                                  ? Colors.deepOrange
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(8)),
+                          child: Center(
+                              child: Text(
+                            'Preparing (0)',
+                            style: TextStyle(
+                                color: _mainscreenProvider.a
+                                    ? Colors.white
+                                    : Colors.black,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700),
+                          )),
+                        );
+                      }
+
                       return GestureDetector(
                         onTap: () {
                           _mainscreenProvider.a = true;
@@ -112,21 +134,42 @@ class TopContainer implements SliverPersistentHeaderDelegate {
                     stream: _firestore.collection('currentOrder').snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<dynamic> snapshot) {
-                      if (snapshot.hasError) {
-                        return Text('errror');
-                      }
                       List order = [];
-                      snapshot.data.docs.forEach((element) {
-                        if (element
-                                .data()
-                                .values
-                                .first
-                                .values
-                                .first['inProgress'] ==
-                            false) {
-                          order.add(element);
-                        }
-                      });
+                      try {
+                        snapshot.data.docs.forEach((element) {
+                          if (element
+                                  .data()
+                                  .values
+                                  .first
+                                  .values
+                                  .first['inProgress'] ==
+                              false) {
+                            order.add(element);
+                          }
+                        });
+                      } catch (e) {
+                        return Container(
+                          margin: EdgeInsets.symmetric(horizontal: 10),
+                          width: size.width / 3,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              color: _mainscreenProvider.b
+                                  ? Colors.deepOrange
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(8)),
+                          child: Center(
+                              child: Text(
+                            'Ready (0)',
+                            style: TextStyle(
+                                color: _mainscreenProvider.b
+                                    ? Colors.white
+                                    : Colors.black,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700),
+                          )),
+                        );
+                      }
+
                       return GestureDetector(
                         onTap: () {
                           _mainscreenProvider.a = false;
@@ -162,8 +205,12 @@ class TopContainer implements SliverPersistentHeaderDelegate {
                     stream: _firestore.collection('orderHistory').snapshots(),
                     builder: (BuildContext context,
                         AsyncSnapshot<dynamic> snapshot) {
-                      if(snapshot.data.documents == null){
-                        return Text('0');
+                      int preparing = 0;
+                      try {
+                        preparing = snapshot.data.documents.length;
+                      } catch (e) {
+                        print(e);
+                        return Text('History (0)');
                       }
                       return GestureDetector(
                         onTap: () {
@@ -183,7 +230,7 @@ class TopContainer implements SliverPersistentHeaderDelegate {
                               borderRadius: BorderRadius.circular(8)),
                           child: Center(
                               child: Text(
-                            'History (${snapshot.data.documents.length})',
+                            'History (${preparing})',
                             style: TextStyle(
                                 color: _mainscreenProvider.c
                                     ? Colors.white

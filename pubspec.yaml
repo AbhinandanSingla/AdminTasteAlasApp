@@ -34,6 +34,8 @@ dependencies:
   provider: ^4.3.2+2
   dio: ^3.0.10
   lottie: ^0.7.0+1
+  connectivity: ^0.4.9+3
+  data_connection_checker: ^0.3.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -52,6 +54,8 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/animations/delivered.json
+    - assets/animations/connectionLsot.json
+    - assets/animations/wait.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
