@@ -52,7 +52,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     MainScreenProvider _mainScreenProvider =
         Provider.of<MainScreenProvider>(context);
-    ConnectionCheck _connectivity = Provider.of<ConnectionCheck>(context);
+    ConnectionCheck _connectivity =
+        Provider.of<ConnectionCheck>(context, listen: true);
     print(_connectivity);
     final size = MediaQuery.of(context).size;
     switch (_connectivity) {

@@ -63,38 +63,17 @@ class MainScreenProvider extends ChangeNotifier {
 }
 
 class CheckConnectionStatus {
-  StreamController<ConnectivityStatus> connectionStatusController =
-      StreamController<ConnectivityStatus>();
   StreamController<ConnectionCheck> connectionChecker =
       StreamController<ConnectionCheck>();
-
   CheckConnectionStatus() {
     DataConnectionChecker().onStatusChange.listen((status) {
       var ConnectionStatus = _check(status);
       connectionChecker.add(ConnectionStatus);
     });
 
-    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
-      // convert our result
-      var connectionStatus = _connectivityStatus(result);
-      //Emit this to our stream
-      connectionStatusController.add(connectionStatus);
-    });
   }
 
-// Converting result to enum
-  ConnectivityStatus _connectivityStatus(ConnectivityResult result) {
-    switch (result) {
-      case ConnectivityResult.wifi:
-        return ConnectivityStatus.Wifi;
-      case ConnectivityResult.mobile:
-        return ConnectivityStatus.Cellular;
-      case ConnectivityResult.none:
-        return ConnectivityStatus.Offline;
-      default:
-        return ConnectivityStatus.Offline;
-    }
-  }
+
 
   ConnectionCheck _check(DataConnectionStatus _status) {
     switch (_status) {
