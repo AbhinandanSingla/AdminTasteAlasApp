@@ -14,6 +14,7 @@ class TopContainer implements SliverPersistentHeaderDelegate {
   final double minExtent;
   final double maxExtent;
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final _controller = TextEditingController();
 
   @override
   Widget build(
@@ -41,6 +42,10 @@ class TopContainer implements SliverPersistentHeaderDelegate {
             height: 40,
             width: size.width,
             child: TextField(
+              onChanged: (value) {
+
+              },
+              controller: _controller,
               decoration: InputDecoration(
                   prefixIcon: Icon(Icons.search),
                   hintText: 'Search by order id ',

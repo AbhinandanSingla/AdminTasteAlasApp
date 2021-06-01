@@ -15,7 +15,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -44,7 +43,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
@@ -79,6 +77,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       builder: (BuildContext context,
                           AsyncSnapshot<dynamic> snapshot) {
                         Orders.clear();
+
                         try {
                           snapshot.data.docs.forEach((element) {
                             Orders.add(element);

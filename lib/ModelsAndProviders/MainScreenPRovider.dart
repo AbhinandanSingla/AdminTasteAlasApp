@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:data_connection_checker/data_connection_checker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:tasteatlasadmin/ModelsAndProviders/connectivity_status.dart';
@@ -15,6 +14,13 @@ class MainScreenProvider extends ChangeNotifier {
 
   void refresh() {
     notifyListeners();
+  }
+
+  search(id) {
+    final orders = _firestore.collection('currentOrder').snapshots();
+    orders.forEach((element) {
+      print(element);
+    });
   }
 
   prepared(String orderId, String uid, Map productList) async {
@@ -65,15 +71,13 @@ class MainScreenProvider extends ChangeNotifier {
 class CheckConnectionStatus {
   StreamController<ConnectionCheck> connectionChecker =
       StreamController<ConnectionCheck>();
+
   CheckConnectionStatus() {
     DataConnectionChecker().onStatusChange.listen((status) {
       var ConnectionStatus = _check(status);
       connectionChecker.add(ConnectionStatus);
     });
-
   }
-
-
 
   ConnectionCheck _check(DataConnectionStatus _status) {
     switch (_status) {
