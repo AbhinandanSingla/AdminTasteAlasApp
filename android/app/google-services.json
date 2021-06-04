@@ -1,0 +1,151 @@
+{
+  "project_info": {
+    "project_number": "500069966930",
+    "firebase_url": "https://appetizer-619b5.firebaseio.com",
+    "project_id": "appetizer-619b5",
+    "storage_bucket": "appetizer-619b5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500069966930:android:5ee689592525723a1aab8b",
+        "android_client_info": {
+          "package_name": "com.example.admin_app_tasteatlas"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "500069966930-u28bpsg7h6f5e9avhee8li3htu3ogbju.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_d7c4rfkQqxqzo51YCLznMhsHFmX-CDI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "500069966930-u28bpsg7h6f5e9avhee8li3htu3ogbju.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500069966930:android:4184a9eff6917e201aab8b",
+        "android_client_info": {
+          "package_name": "com.example.appetizer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "500069966930-o75krosq1tff3usb2dorojv2rpo9kd9p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.appetizer",
+            "certificate_hash": "fd4358de59662677a1b4217b29cde5e5c27cd6bb"
+          }
+        },
+        {
+          "client_id": "500069966930-u28bpsg7h6f5e9avhee8li3htu3ogbju.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_d7c4rfkQqxqzo51YCLznMhsHFmX-CDI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "500069966930-u28bpsg7h6f5e9avhee8li3htu3ogbju.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500069966930:android:0ae6ea46fe1b82951aab8b",
+        "android_client_info": {
+          "package_name": "com.example.final_wala_final_pka"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "500069966930-jc1mt68i8a9a8br6k2gucuecvbrann5f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.final_wala_final_pka",
+            "certificate_hash": "7a3e26efb242dd020968fe995bc8fb4c139aa1fc"
+          }
+        },
+        {
+          "client_id": "500069966930-u28bpsg7h6f5e9avhee8li3htu3ogbju.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_d7c4rfkQqxqzo51YCLznMhsHFmX-CDI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "500069966930-u28bpsg7h6f5e9avhee8li3htu3ogbju.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500069966930:android:c2807b6490276ea11aab8b",
+        "android_client_info": {
+          "package_name": "com.example.tasteatlasadmin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "500069966930-nb6ltbephdlt6a16knkkq5t0d79ut041.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.tasteatlasadmin",
+            "certificate_hash": "fd4358de59662677a1b4217b29cde5e5c27cd6bb"
+          }
+        },
+        {
+          "client_id": "500069966930-u28bpsg7h6f5e9avhee8li3htu3ogbju.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_d7c4rfkQqxqzo51YCLznMhsHFmX-CDI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "500069966930-u28bpsg7h6f5e9avhee8li3htu3ogbju.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
